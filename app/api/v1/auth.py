@@ -1,6 +1,6 @@
 from datetime import timedelta
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Any, List, Optional
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from jose import jwt, JWTError
@@ -74,3 +74,25 @@ def login(session: Session = Depends(get_session), form_data: OAuth2PasswordRequ
 @router.get("/me", response_model=UserRead)
 def read_user_me(current_user: User = Depends(get_current_user)) -> Any:
     return current_user
+
+# @router.get("/users", response_model=list[UserRead])
+# def list_users(role: UserRole = None, session: Session = Depends(get_session)) -> Any:
+#     query = select(User)
+#     if role:
+#         query = query.where(User.role == role)
+#     users = session.exec(query).all()
+#     return users
+
+@router.get("/users", response_model=List[UserRead])
+def read_users(
+    session: Session = Depends(get_session),
+    role: Optional[UserRole] = None,
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Get all users, optionally filtered by role.
+    """
+    query = select(User)
+    if role:
+        query = query.where(User.role == role)
+    return session.exec(query).all()

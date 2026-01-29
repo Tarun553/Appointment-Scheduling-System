@@ -3,6 +3,7 @@ from app.api.v1 import auth, appointments, availability
 from app.db.session import init_db
 from app.core.config import settings
 from app.core.scheduler import start_scheduler, shutdown_scheduler
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -14,6 +15,14 @@ def on_startup():
 @app.on_event("shutdown")
 def on_shutdown():
     shutdown_scheduler()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
