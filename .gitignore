@@ -1,8 +1,51 @@
-__pycache__
-.env
-tests
-appointment.db
-.venv
-.env.example
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 
-appointment_scheduling.postman_collection.json
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Environment
+.env
+.env.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+appointment.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+CHANGELOG.md
+QUICKSTART.md
+
+tests

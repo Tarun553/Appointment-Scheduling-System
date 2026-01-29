@@ -7,6 +7,7 @@ class AppointmentStatus(str, Enum):
     SCHEDULED = "scheduled"
     CANCELLED = "cancelled"
     COMPLETED = "completed"
+    NO_SHOW = "no_show"
 
 class AppointmentBase(SQLModel):
     start_time: datetime
@@ -36,6 +37,11 @@ class AppointmentUpdate(SQLModel):
     end_time: Optional[datetime] = None
     notes: Optional[str] = None
     status: Optional[AppointmentStatus] = None
+
+class AppointmentReschedule(SQLModel):
+    new_start_time: datetime
+    new_end_time: datetime
+    reason: Optional[str] = None
 
 class AppointmentRead(AppointmentBase):
     id: int

@@ -12,6 +12,8 @@ class UserBase(SQLModel):
     full_name: Optional[str] = None
     role: UserRole = Field(default=UserRole.CLIENT)
     is_active: bool = Field(default=True)
+    no_show_count: int = Field(default=0)
+    is_blocked: bool = Field(default=False)
 
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

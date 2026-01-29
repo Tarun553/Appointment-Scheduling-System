@@ -1,0 +1,838 @@
+{
+  "info": {
+    "_postman_id": "appointment-scheduling-complete",
+    "name": "Appointment Scheduling System - Complete",
+    "description": "Complete API collection with all endpoints including availability slots, rescheduling, calendar export, and no-show tracking",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"full_name\": \"Admin User\",\n    \"password\": \"admin123\",\n    \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register an admin user"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Staff",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"staff@example.com\",\n    \"full_name\": \"Jane Staff\",\n    \"password\": \"staff123\",\n    \"role\": \"staff\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a staff member"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"client@example.com\",\n    \"full_name\": \"John Client\",\n    \"password\": \"client123\",\n    \"role\": \"client\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a client"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Staff",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.environment.set(\"staff_token\", jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "staff@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "staff123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login as staff and save token"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.environment.set(\"client_token\", jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "client@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "client123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login as client and save token"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User (Staff)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current staff user info"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User (Client)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current client user info"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Availability Management",
+      "item": [
+        {
+          "name": "Create Availability - Monday",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"day_of_week\": 0,\n    \"start_time\": \"09:00:00\",\n    \"end_time\": \"17:00:00\",\n    \"is_recurring\": true,\n    \"staff_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/availability/",
+              "host": ["{{base_url}}"],
+              "path": ["availability", ""]
+            },
+            "description": "Set Monday availability (0=Monday)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Availability - Tuesday",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"day_of_week\": 1,\n    \"start_time\": \"09:00:00\",\n    \"end_time\": \"17:00:00\",\n    \"is_recurring\": true,\n    \"staff_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/availability/",
+              "host": ["{{base_url}}"],
+              "path": ["availability", ""]
+            },
+            "description": "Set Tuesday availability"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Specific Date Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"specific_date\": \"2026-02-15\",\n    \"start_time\": \"10:00:00\",\n    \"end_time\": \"14:00:00\",\n    \"is_recurring\": false,\n    \"staff_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/availability/",
+              "host": ["{{base_url}}"],
+              "path": ["availability", ""]
+            },
+            "description": "Set availability for a specific date"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Availabilities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/availability/",
+              "host": ["{{base_url}}"],
+              "path": ["availability", ""]
+            },
+            "description": "Get all availability slots"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Availability by Staff",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/availability/?staff_id=2",
+              "host": ["{{base_url}}"],
+              "path": ["availability", ""],
+              "query": [
+                {
+                  "key": "staff_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Get availability for specific staff member"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Slots",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/availability/slots?staff_id=2&date=2026-02-03&slot_duration=60",
+              "host": ["{{base_url}}"],
+              "path": ["availability", "slots"],
+              "query": [
+                {
+                  "key": "staff_id",
+                  "value": "2",
+                  "description": "Staff member ID"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-02-03",
+                  "description": "Date to check (YYYY-MM-DD)"
+                },
+                {
+                  "key": "slot_duration",
+                  "value": "60",
+                  "description": "Slot duration in minutes"
+                }
+              ]
+            },
+            "description": "Get available time slots for booking"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Slots - 30min",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/availability/slots?staff_id=2&date=2026-02-03&slot_duration=30",
+              "host": ["{{base_url}}"],
+              "path": ["availability", "slots"],
+              "query": [
+                {
+                  "key": "staff_id",
+                  "value": "2"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-02-03"
+                },
+                {
+                  "key": "slot_duration",
+                  "value": "30",
+                  "description": "30 minute slots"
+                }
+              ]
+            },
+            "description": "Get 30-minute slots"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Appointments",
+      "item": [
+        {
+          "name": "Book Appointment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.environment.set(\"appointment_id\", jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"staff_id\": 2,\n    \"start_time\": \"2026-02-03T10:00:00\",\n    \"end_time\": \"2026-02-03T11:00:00\",\n    \"notes\": \"Initial consultation for new project\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Book a new appointment (sends confirmation emails)"
+          },
+          "response": []
+        },
+        {
+          "name": "Book Second Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"staff_id\": 2,\n    \"start_time\": \"2026-02-03T14:00:00\",\n    \"end_time\": \"2026-02-03T15:00:00\",\n    \"notes\": \"Follow-up meeting\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Book another appointment"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Appointments (Client)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Client sees only their appointments"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Appointments (Staff)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Staff sees appointments assigned to them"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Updated notes - bringing documents\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "Update appointment details"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "Cancel an appointment (2-hour policy enforced)"
+          },
+          "response": []
+        },
+        {
+          "name": "Reschedule Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"new_start_time\": \"2026-02-04T10:00:00\",\n    \"new_end_time\": \"2026-02-04T11:00:00\",\n    \"reason\": \"Schedule conflict - need to move to next day\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/reschedule",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "reschedule"]
+            },
+            "description": "Reschedule appointment to new time (validates availability)"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Appointment Completed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/mark-completed",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "mark-completed"]
+            },
+            "description": "Staff marks appointment as completed"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Appointment No-Show",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/mark-no-show",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "mark-no-show"]
+            },
+            "description": "Staff marks appointment as no-show (increments client no-show count)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Calendar Export",
+      "item": [
+        {
+          "name": "Export Single Appointment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/export.ics",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "export.ics"]
+            },
+            "description": "Export appointment as .ics file (importable to calendars)"
+          },
+          "response": []
+        },
+        {
+          "name": "Export All Appointments (Client)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/export-all.ics",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "export-all.ics"]
+            },
+            "description": "Export all client appointments as single .ics file"
+          },
+          "response": []
+        },
+        {
+          "name": "Export All Appointments (Staff)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{staff_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/export-all.ics",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "export-all.ics"]
+            },
+            "description": "Export all staff appointments as single .ics file"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Testing Scenarios",
+      "item": [
+        {
+          "name": "Try Double Booking (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"staff_id\": 2,\n    \"start_time\": \"2026-02-03T10:00:00\",\n    \"end_time\": \"2026-02-03T11:00:00\",\n    \"notes\": \"This should fail - time slot already booked\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Should return error - staff not available"
+          },
+          "response": []
+        },
+        {
+          "name": "Try Booking Outside Availability (Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"staff_id\": 2,\n    \"start_time\": \"2026-02-03T22:00:00\",\n    \"end_time\": \"2026-02-03T23:00:00\",\n    \"notes\": \"This should fail - outside availability hours\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Should return error - outside availability"
+          },
+          "response": []
+        },
+        {
+          "name": "Check After 3 No-Shows (Should be Blocked)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"staff_id\": 2,\n    \"start_time\": \"2026-02-05T10:00:00\",\n    \"end_time\": \"2026-02-05T11:00:00\",\n    \"notes\": \"Testing block after 3 no-shows\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "After marking 3 appointments as no-show, client should be blocked"
+          },
+          "response": []
+        },
+        {
+          "name": "Try Unauthorized Access (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", ""]
+            },
+            "description": "Should return 401 - no token provided"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "staff_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "client_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "appointment_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

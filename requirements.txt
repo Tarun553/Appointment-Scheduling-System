@@ -9,3 +9,5 @@ emails
 pytest
 httpx
 fastapi-mail
+apscheduler
+ics
