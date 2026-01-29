@@ -277,8 +277,8 @@ def reschedule_appointment(
         )
         
         staff_html = get_appointment_rescheduled_template(
-            client_name=staff.full_name or staff.email,
-            staff_name=client.full_name or client.email,
+            client_name=client.full_name or client.email,
+            staff_name=staff.full_name or staff.email,
             old_time=old_start_time,
             new_start_time=db_obj.start_time,
             new_end_time=db_obj.end_time
@@ -366,13 +366,23 @@ def export_all_appointments_ical(
     
     appointments = session.exec(query).all()
     
+    # Collect all user IDs to fetch in batch
+    user_ids = set()
+    for appointment in appointments:
+        user_ids.add(appointment.client_id)
+        user_ids.add(appointment.staff_id)
+    
+    # Fetch users in one query
+    users = session.exec(select(User).where(User.id.in_(user_ids))).all()
+    user_map = {user.id: user for user in users}
+    
     # Create calendar
     cal = Calendar()
     cal.creator = f"Appointment Scheduling System - {current_user.email}"
     
     for appointment in appointments:
-        client = session.get(User, appointment.client_id)
-        staff = session.get(User, appointment.staff_id)
+        client = user_map.get(appointment.client_id)
+        staff = user_map.get(appointment.staff_id)
         
         event = Event()
         event.name = f"Appointment with {staff.full_name or staff.email if staff else 'Staff'}"
@@ -472,6 +482,10 @@ def mark_appointment_completed(
     # Can only mark scheduled appointments as completed
     if db_obj.status != AppointmentStatus.SCHEDULED:
         raise HTTPException(status_code=400, detail=f"Cannot mark {db_obj.status} appointment as completed")
+    
+    # Check if appointment time has passed
+    if db_obj.start_time > datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Cannot mark future appointment as completed")
     
     db_obj.status = AppointmentStatus.COMPLETED
     session.add(db_obj)

@@ -56,7 +56,7 @@ def get_available_slots(
     session: Session = Depends(get_session),
     staff_id: int = Query(..., description="Staff member ID"),
     date_param: date = Query(..., alias="date", description="Date to check availability (YYYY-MM-DD)"),
-    slot_duration: int = Query(60, description="Duration of each slot in minutes")
+    slot_duration: int = Query(60, ge=1, le=480, description="Duration of each slot in minutes(1-480)")
 ) -> Any:
     """
     Get available time slots for a staff member on a specific date.
@@ -89,8 +89,8 @@ def get_available_slots(
             and_(
                 Appointment.staff_id == staff_id,
                 Appointment.status == AppointmentStatus.SCHEDULED,
-                Appointment.start_time >= start_of_day,
-                Appointment.start_time <= end_of_day
+                Appointment.start_time < end_of_day,
+                Appointment.end_time > start_of_day
             )
         )
     ).all()

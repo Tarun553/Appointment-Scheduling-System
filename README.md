@@ -58,16 +58,15 @@ A comprehensive backend API for booking and managing appointments with availabil
 ### Setup
 
 1. Clone the repository:
-```bash
-cd appointment
-```
 
 2. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. Configure environment variables in `.env`:
+
 ```env
 PROJECT_NAME="Appointment Scheduling System"
 API_V1_STR="/api/v1"
@@ -88,6 +87,7 @@ USE_CREDENTIALS=True
 ```
 
 4. Run the application:
+
 ```bash
 uvicorn app.main:app --reload
 ```
@@ -97,6 +97,7 @@ The API will be available at `http://localhost:8000`
 ## API Documentation
 
 Once running, visit:
+
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
@@ -104,32 +105,32 @@ Once running, visit:
 
 ### Authentication
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/v1/auth/register` | Register a new user | No |
-| POST | `/api/v1/auth/login` | Login and get access token | No |
-| GET | `/api/v1/auth/me` | Get current user info | Yes |
+| Method | Endpoint                | Description                | Auth Required |
+| ------ | ----------------------- | -------------------------- | ------------- |
+| POST   | `/api/v1/auth/register` | Register a new user        | No            |
+| POST   | `/api/v1/auth/login`    | Login and get access token | No            |
+| GET    | `/api/v1/auth/me`       | Get current user info      | Yes           |
 
 ### Availability
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/v1/availability/` | Create availability slot | Staff/Admin |
-| GET | `/api/v1/availability/` | List availability slots | No |
-| GET | `/api/v1/availability/slots` | Get available time slots | No |
+| Method | Endpoint                     | Description              | Auth Required |
+| ------ | ---------------------------- | ------------------------ | ------------- |
+| POST   | `/api/v1/availability/`      | Create availability slot | Staff/Admin   |
+| GET    | `/api/v1/availability/`      | List availability slots  | No            |
+| GET    | `/api/v1/availability/slots` | Get available time slots | No            |
 
 ### Appointments
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/v1/appointments/` | Book an appointment | Yes |
-| GET | `/api/v1/appointments/` | List appointments | Yes |
-| PATCH | `/api/v1/appointments/{id}` | Update appointment | Yes |
-| POST | `/api/v1/appointments/{id}/reschedule` | Reschedule appointment | Yes |
-| POST | `/api/v1/appointments/{id}/mark-no-show` | Mark as no-show | Staff/Admin |
-| POST | `/api/v1/appointments/{id}/mark-completed` | Mark as completed | Staff/Admin |
-| GET | `/api/v1/appointments/{id}/export.ics` | Export appointment as iCal | Yes |
-| GET | `/api/v1/appointments/export-all.ics` | Export all appointments | Yes |
+| Method | Endpoint                                   | Description                | Auth Required |
+| ------ | ------------------------------------------ | -------------------------- | ------------- |
+| POST   | `/api/v1/appointments/`                    | Book an appointment        | Yes           |
+| GET    | `/api/v1/appointments/`                    | List appointments          | Yes           |
+| PATCH  | `/api/v1/appointments/{id}`                | Update appointment         | Yes           |
+| POST   | `/api/v1/appointments/{id}/reschedule`     | Reschedule appointment     | Yes           |
+| POST   | `/api/v1/appointments/{id}/mark-no-show`   | Mark as no-show            | Staff/Admin   |
+| POST   | `/api/v1/appointments/{id}/mark-completed` | Mark as completed          | Staff/Admin   |
+| GET    | `/api/v1/appointments/{id}/export.ics`     | Export appointment as iCal | Yes           |
+| GET    | `/api/v1/appointments/export-all.ics`      | Export all appointments    | Yes           |
 
 ## Usage Examples
 
@@ -155,6 +156,7 @@ curl -X POST "http://localhost:8000/api/v1/auth/login" \
 ```
 
 Response:
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -221,6 +223,7 @@ curl "http://localhost:8000/api/v1/appointments/1/export.ics" \
 ## User Roles
 
 ### Client
+
 - Book appointments
 - View their own appointments
 - Reschedule/cancel appointments
@@ -228,12 +231,14 @@ curl "http://localhost:8000/api/v1/appointments/1/export.ics" \
 - Blocked automatically after 3 no-shows
 
 ### Staff
+
 - Set their own availability
 - View appointments assigned to them
 - Mark appointments as completed or no-show
 - Export their appointments
 
 ### Admin
+
 - Full access to all appointments
 - Manage all availabilities
 - View all users
@@ -242,31 +247,37 @@ curl "http://localhost:8000/api/v1/appointments/1/export.ics" \
 ## Automated Features
 
 ### Email Reminders
+
 - Automatically sends reminder emails 24 hours before appointments
 - Runs every hour to check for upcoming appointments
 - Uses HTML email templates
 
 ### No-Show Policy
+
 - Tracks no-show count per client
 - Automatically blocks clients after 3 no-shows
 - Blocked clients cannot book new appointments
 
 ### Cancellation Policy
+
 - Cannot cancel/reschedule within 2 hours of appointment start time
 - Only scheduled appointments can be modified
 
 ## Database Schema
 
 ### User
+
 - id, email, full_name, role, is_active
 - hashed_password
 - no_show_count, is_blocked
 
 ### Appointment
+
 - id, start_time, end_time, notes, status
 - client_id, staff_id
 
 ### Availability
+
 - id, day_of_week, specific_date
 - start_time, end_time, is_recurring
 - staff_id
@@ -274,14 +285,16 @@ curl "http://localhost:8000/api/v1/appointments/1/export.ics" \
 ## Development
 
 ### Run Tests
+
 ```bash
 pytest tests/
 ```
 
 ### Database Migration
+
 The database is automatically initialized on startup. To reset:
+
 ```bash
-rm appointment.db
 
 ## Postman Collection
 
@@ -307,3 +320,4 @@ MIT License
 ## Support
 
 For issues or questions, please contact support or create an issue in the repository.
+```
